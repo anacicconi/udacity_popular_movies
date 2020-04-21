@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:padding="@dimen/padding_medium"
     tools:context=".DetailsActivity"
     >
     <ScrollView
@@ -13,93 +13,103 @@
         android:layout_height="wrap_content">
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            >
             <ImageView
                 android:id="@+id/iv_thumbnail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 android:contentDescription="@string/movie_thumbnail"
+                app:layout_constraintEnd_toStartOf="@+id/tv_title_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/placeholder"
                 />
             <TextView
                 android:id="@+id/tv_title_label"
+                style="@style/detail_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/iv_thumbnail"
+                android:layout_marginStart="@dimen/margin_medium"
                 android:text="@string/original_title"
-                android:layout_marginStart="16dp"
-                style="@style/detail_label"
+                app:layout_constraintEnd_toStartOf="@+id/tv_title"
+                app:layout_constraintStart_toEndOf="@+id/iv_thumbnail"
+                app:layout_constraintTop_toTopOf="parent"
                 />
             <TextView
                 android:id="@+id/tv_title"
+                style="@style/detail_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/tv_title_label"
+                android:layout_marginStart="@dimen/margin_medium"
                 app:layout_constraintStart_toEndOf="@+id/iv_thumbnail"
-                android:layout_marginStart="16dp"
-                style="@style/detail_value"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_label"
+                tools:text="Pirates des Caraïbes : Jusqu'au bout du monde"
                 />
             <TextView
                 android:id="@+id/tv_synopsis_label"
+                style="@style/detail_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/iv_thumbnail"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="@dimen/margin_medium"
                 android:text="@string/synopsis"
-                android:layout_marginTop="16dp"
-                style="@style/detail_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_thumbnail"
                 />
             <TextView
                 android:id="@+id/tv_synopsis"
+                style="@style/detail_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/tv_synopsis_label"
                 app:layout_constraintStart_toStartOf="parent"
-                style="@style/detail_value"
+                app:layout_constraintTop_toBottomOf="@+id/tv_synopsis_label"
+                tools:text="L'âge d'or de la piraterie touche à sa fin. Même le terrifiant Vaisseau Fantôme et son capitaine maudit Davy Jones servent à présent Lord Cutler Beckett et la Compagnie anglaise des Indes Orientales. L'invincible Hollandais Volant écume désormais les sept mers, massacrant sans pitié pirates de tous bords et sabordant leurs navires.
+Will Turner, Elizabeth Swann et le capitaine Barbossa n'ont qu'une seule chance de résister à Beckett et à son armada destructrice : ils doivent rassembler les Neuf Seigneurs de la Cour des Frères, mais l'un des membres les plus éminents, le capitaine Jack Sparrow, manque à l'appel.
+Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent faire voile vers des mers orientales inconnues, pour affronter un pirate chinois, le capitaine Sao Feng, et s'emparer des cartes qui les conduiront au-delà des limites du monde connu, là où Jack est retenu..."
                 />
             <TextView
                 android:id="@+id/tv_release_date_label"
+                style="@style/detail_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/tv_synopsis"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="@dimen/margin_medium"
                 android:text="@string/release_date"
-                android:layout_marginTop="16dp"
-                style="@style/detail_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_synopsis"
                 />
             <TextView
                 android:id="@+id/tv_release_date"
+                style="@style/detail_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/tv_release_date_label"
                 app:layout_constraintStart_toStartOf="parent"
-                style="@style/detail_value"
+                app:layout_constraintTop_toBottomOf="@+id/tv_release_date_label"
+                tools:text="2007-11-23"
                 />
             <TextView
                 android:id="@+id/tv_rating_label"
+                style="@style/detail_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/tv_release_date"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginEnd="@dimen/margin_medium"
+                android:gravity="center_vertical"
+                android:text="@string/rating"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/tv_rating"
-                android:layout_marginTop="16dp"
-                android:text="@string/rating"
-                android:gravity="center_vertical"
-                android:layout_marginEnd="16dp"
-                style="@style/detail_label"
+                app:layout_constraintTop_toBottomOf="@+id/tv_release_date"
                 />
             <TextView
                 android:id="@+id/tv_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/rating_text"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="16dp"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorAccent"
+                tools:text="3,8"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
@@ -107,8 +117,8 @@
         android:id="@+id/tv_error_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:padding="@dimen/padding_medium"
         android:text="@string/error_message"
-        android:textSize="20sp"
+        android:textSize="@dimen/subtitle_text"
         android:visibility="invisible" />
 </FrameLayout>

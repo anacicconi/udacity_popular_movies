@@ -17,6 +17,7 @@ import android.os.Bundle;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.cicconi.popularmovies.adapter.MovieAdapter;
+import com.cicconi.popularmovies.async.FetchMovieTask;
 import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.utils.MovieJsonUtils;
 import com.cicconi.popularmovies.utils.NetworkUtils;
@@ -28,7 +29,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener,
+    FetchMovieTask.FetchMovieStart, FetchMovieTask.FetchMovieEnd {
 
     private static final int NUMBER_OF_COLUMNS = 2;
     private static final int SORT_POPULAR = 100;
@@ -93,64 +95,25 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     private void loadMovies(int sortType, int pagination) {
-        new FetchMovieTask().execute(sortType, pagination);
+        new FetchMovieTask(this).execute(sortType, pagination);
     }
 
-    private class FetchMovieTask extends AsyncTask<Integer, Void, List<Movie>> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
+    @Override
+    public void loadStart() {
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+    }
 
-        @Override
-        protected List<Movie> doInBackground(Integer... params) {
-            List<Movie> emptyMovieList = new ArrayList<>();
-            if(!isMobileOnline()) {
-                return emptyMovieList;
-            }
+    @Override
+    public void loadFinish(List<Movie> movies) {
+        if (!movies.isEmpty()) {
+            loading = true;
+            page = movies.get(0).getPage();
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
 
-            int sortType = params[0];
-            int pagination = params[1];
-            URL weatherRequestUrl = NetworkUtils.buildUrl(sortType, String.valueOf(pagination));
-
-            try {
-                String moviesResponse = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
-                return MovieJsonUtils.getMoviesFromJson(moviesResponse);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return emptyMovieList;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(List<Movie> movies) {
-            if (!movies.isEmpty()) {
-                loading = true;
-                page = movies.get(0).getPage();
-                mLoadingIndicator.setVisibility(View.INVISIBLE);
-
-                showMovieData();
-                mMovieAdapter.setMoviesData(movies);
-            } else {
-                showErrorMessage();
-            }
-        }
-
-        boolean isMobileOnline() {
-            try {
-                int timeoutMs = 1500;
-                Socket sock = new Socket();
-                // check google dns
-                SocketAddress socketAddress = new InetSocketAddress("8.8.8.8", 53);
-
-                sock.connect(socketAddress, timeoutMs);
-                sock.close();
-
-                return true;
-            } catch (IOException e) {
-                return false;
-            }
+            showMovieData();
+            mMovieAdapter.setMoviesData(movies);
+        } else {
+            showErrorMessage();
         }
     }
 
