@@ -10,69 +10,60 @@
     <ScrollView
         android:id="@+id/movie_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        >
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             >
-            <LinearLayout
-                android:id="@+id/header"
+            <ImageView
+                android:id="@+id/iv_thumbnail"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/movie_thumbnail"
+                app:layout_constraintEnd_toStartOf="@+id/guideline"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/placeholder"
+                />
+            <TextView
+                android:id="@+id/tv_title_label"
+                style="@style/detail_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_medium"
+                android:text="@string/original_title"
+                app:layout_constraintStart_toEndOf="@+id/guideline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                >
-                <ImageView
-                    android:id="@+id/iv_thumbnail"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/movie_thumbnail"
-                    android:layout_weight="1"
-                    tools:src="@drawable/placeholder"
-                    android:layout_gravity="top"
-                    android:scaleType="fitStart"
-                    android:adjustViewBounds="true"
-                    />
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:orientation="vertical"
-                    >
-                    <TextView
-                        android:id="@+id/tv_title_label"
-                        style="@style/detail_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_medium"
-                        android:text="@string/original_title"
-                        />
-                    <TextView
-                        android:id="@+id/tv_title"
-                        style="@style/detail_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_medium"
-                        tools:text="Pirates des Caraïbes : Jusqu'au bout du monde"
-                        />
-                </LinearLayout>
-            </LinearLayout>
+                />
+            <TextView
+                android:id="@+id/tv_title"
+                style="@style/detail_value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_medium"
+                app:layout_constraintStart_toEndOf="@+id/guideline"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_label"
+                tools:text="Pirates des Caraïbes : Jusqu'au bout du monde"
+                />
             <TextView
                 android:id="@+id/tv_synopsis_label"
                 style="@style/detail_label"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_medium"
                 android:text="@string/synopsis"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/header"
+                app:layout_constraintTop_toBottomOf="@+id/iv_thumbnail"
                 />
             <TextView
                 android:id="@+id/tv_synopsis"
                 style="@style/detail_value"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_synopsis_label"
@@ -83,7 +74,7 @@ Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent
             <TextView
                 android:id="@+id/tv_release_date_label"
                 style="@style/detail_label"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_medium"
                 android:text="@string/release_date"
@@ -93,7 +84,7 @@ Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent
             <TextView
                 android:id="@+id/tv_release_date"
                 style="@style/detail_value"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_release_date_label"
@@ -102,7 +93,7 @@ Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent
             <TextView
                 android:id="@+id/tv_rating_label"
                 style="@style/detail_label"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_medium"
                 android:layout_marginEnd="@dimen/margin_medium"
@@ -114,7 +105,7 @@ Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent
                 />
             <TextView
                 android:id="@+id/tv_rating"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_medium"
                 android:textColor="@color/colorAccent"
@@ -123,6 +114,13 @@ Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="3,8"
+                />
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="120dp"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
