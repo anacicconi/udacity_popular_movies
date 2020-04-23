@@ -2,9 +2,9 @@ package com.cicconi.popularmovies;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,19 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cicconi.popularmovies.adapter.MovieAdapter;
 import com.cicconi.popularmovies.async.FetchMovieTask;
 import com.cicconi.popularmovies.model.Movie;
-import com.cicconi.popularmovies.utils.MovieJsonUtils;
-import com.cicconi.popularmovies.utils.NetworkUtils;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.URL;
-import java.util.ArrayList;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener,
-    FetchMovieTask.FetchMovieStart, FetchMovieTask.FetchMovieEnd {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int NUMBER_OF_COLUMNS = 2;
     private static final int SORT_POPULAR = 100;
     private static final int SORT_RATING = 101;
@@ -95,16 +88,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     private void loadMovies(int sortType, int pagination) {
-        new FetchMovieTask(this).execute(sortType, pagination);
+        loadStart();
+
+        new FetchMovieTask().loadData(sortType, String.valueOf(pagination))
+            .doOnNext(i -> Log.i(TAG, String.format("Thread loadMovies 1: %s", Thread.currentThread().getName())))
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext(i -> Log.i(TAG, String.format("Thread loadMovies 2: %s", Thread.currentThread().getName())))
+            .doOnNext(this::loadFinish)
+            .subscribe();
     }
 
-    @Override
-    public void loadStart() {
+    private void loadStart() {
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    public void loadFinish(List<Movie> movies) {
+    private void loadFinish(List<Movie> movies) {
         if (!movies.isEmpty()) {
             loading = true;
             page = movies.get(0).getPage();
