@@ -14,25 +14,26 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.cicconi.popularmovies.adapter.MovieAdapter;
 import com.cicconi.popularmovies.async.FetchMovieTask;
 import com.cicconi.popularmovies.model.Movie;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import com.cicconi.popularmovies.viewmodel.MovieViewModel;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int NUMBER_OF_COLUMNS = 2;
-    private static final int SORT_POPULAR = 100;
-    private static final int SORT_RATING = 101;
     private static final String EXTRA_MOVIE = "movie";
 
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
     private GridLayoutManager layoutManager;
+
+    private MovieViewModel viewModel;
 
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessage;
@@ -60,7 +61,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mMovieAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        loadMovies(SORT_POPULAR, firstPage);
+        viewModel = new ViewModelProvider(this).get(MovieViewModel.class);
+
+        loadMovies(FetchMovieTask.SORT_POPULAR, firstPage);
 
         handleRecyclerViewScroll();
     }
@@ -78,7 +81,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                         if ((visibleItemCount + firstVisibleItem) >= totalItemCount) {
                             loading = false;
                             if(page != lastPage) {
-                                loadMovies(SORT_POPULAR, page + 1);
+                                page = page + 1;
+                                //loadMovies(FetchMovieTask.SORT_POPULAR, page);
+                                viewModel.setPage(page);
                             }
                         }
                     }
@@ -87,29 +92,46 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         });
     }
 
-    private void loadMovies(int sortType, int pagination) {
+    private void loadMovies(int sortType, int page) {
         loadStart();
 
-        new FetchMovieTask().loadData(sortType, String.valueOf(pagination))
+        /*new FetchMovieTask().getMovies(sortType, String.valueOf(pagination))
             .doOnNext(i -> Log.i(TAG, String.format("Thread loadMovies 1: %s", Thread.currentThread().getName())))
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext(i -> Log.i(TAG, String.format("Thread loadMovies 2: %s", Thread.currentThread().getName())))
             .doOnNext(this::loadFinish)
-            .subscribe();
+            .subscribe();*/
+
+        /*MovieRepository.getPopularMovies(String.valueOf(pagination))
+            .subscribeOn(Schedulers.io())
+            .doOnNext(i -> Log.i(TAG, String.format("Thread loadMovies 1: %s", Thread.currentThread().getName())))
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext(i -> Log.i(TAG, String.format("Thread loadMovies 2: %s", Thread.currentThread().getName())))
+            .doOnNext(moviesResponse -> loadFinish(moviesResponse.getResults(), moviesResponse.getPage()))
+            .subscribe();*/
+
+        viewModel.setPage(1);
+        viewModel.getPopularMovies().observe(this, movies -> {
+            Log.i(TAG, "live data changed");
+            loadFinish(movies, page);
+        });
     }
 
     private void loadStart() {
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
-    private void loadFinish(List<Movie> movies) {
+    private void loadFinish(List<Movie> movies, int page) {
         if (!movies.isEmpty()) {
             loading = true;
-            page = movies.get(0).getPage();
             mLoadingIndicator.setVisibility(View.INVISIBLE);
 
             showMovieData();
-            mMovieAdapter.setMoviesData(movies);
+
+            mMovieAdapter.setMoviesData(movies, page);
+
+            //mRecyclerView.post(() -> mMovieAdapter.setMoviesData(movies, page));
+
         } else {
             showErrorMessage();
         }
@@ -150,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         int id = item.getItemId();
 
         if (id == R.id.action_sort_popular) {
-            loadMovies(SORT_POPULAR, firstPage);
+            //loadMovies(FetchMovieTask.SORT_POPULAR, firstPage);
             mRecyclerView.scrollToPosition(0);
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
@@ -160,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
 
         if (id == R.id.action_sort_rating) {
-            loadMovies(SORT_RATING, firstPage);
+            //loadMovies(FetchMovieTask.SORT_RATING, firstPage);
             mRecyclerView.scrollToPosition(0);
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));

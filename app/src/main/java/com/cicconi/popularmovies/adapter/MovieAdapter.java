@@ -27,8 +27,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         mClickListener = clickListener;
     }
 
-    public void setMoviesData(List<Movie> movies) {
-        if(movies.get(0).getPage() == 1) {
+    public void setMoviesData(List<Movie> movies, int page) {
+        if(page == 1) {
             mMovies = movies;
         } else {
             mMovies.addAll(movies);
@@ -51,7 +51,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         Movie movie = mMovies.get(position);
 
         Picasso.with(context)
-            .load(IMAGE_URL + movie.getImage())
+            .load(IMAGE_URL + movie.getPosterPath())
             .placeholder(R.drawable.placeholder)
             .error(R.drawable.placeholder)
             .into(holder.mMovieImageView);

@@ -1,7 +1,7 @@
 package com.cicconi.popularmovies.async;
 
 import android.util.Log;
-import com.cicconi.popularmovies.model.Movie;
+import com.cicconi.popularmovies.model.OldMovie;
 import com.cicconi.popularmovies.utils.MovieJsonUtils;
 import com.cicconi.popularmovies.utils.NetworkUtils;
 import io.reactivex.rxjava3.core.Observable;
@@ -17,18 +17,58 @@ public class FetchMovieTask {
 
     private static final String TAG = FetchMovieTask.class.getSimpleName();
 
+    public static final int SORT_RATING = 101;
+    public static final int SORT_POPULAR = 100;
+
     /**
-     * Calls isOnline and pass the result to requestUrl.
+     * Calls isOnline and pass the result to requestUrl to get a list of movies.
      *
      * @param sortType popular or top rated
      * @param pagination api page
-     * @return Observable<List<Movie>>
+     * @return Observable<List<OldMovie>>
      */
-    public Observable<List<Movie>> loadData(Integer sortType, String pagination) {
+    public Observable<List<OldMovie>> getMovies(Integer sortType, String pagination) {
+        String endpoint;
+
+        if(sortType == SORT_RATING) {
+            endpoint = NetworkUtils.TOP_RATED_MOVIES_URL;
+        } else {
+            endpoint = NetworkUtils.POPULAR_MOVIES_URL;
+        }
 
         return isMobileOnline()
             .subscribeOn(Schedulers.io())
-            .switchMap(isOnline -> requestUrl(isOnline, sortType, pagination))
+            .switchMap(isOnline -> requestUrl(isOnline, endpoint, pagination))
+            .defaultIfEmpty("") // if empty the default will be "" because the ui needs a response to know how to handle this case
+            .map(MovieJsonUtils::getMoviesFromJson);
+    }
+
+    /**
+     * Calls isOnline and pass the result to requestUrl to get a list of videos for a movie.
+     *
+     * @param id movie id
+     * @return Observable<List<OldMovie>>
+     */
+    public Observable<List<OldMovie>> getVideosById(String id) {
+
+        return isMobileOnline()
+            .subscribeOn(Schedulers.io())
+            .switchMap(isOnline -> requestUrl(isOnline, NetworkUtils.VIDEO_MOVIES_URL, null))
+            .defaultIfEmpty("") // if empty the default will be "" because the ui needs a response to know how to handle this case
+            .map(MovieJsonUtils::getMoviesFromJson);
+    }
+
+    /**
+     * Calls isOnline and pass the result to requestUrl to get a list of reviews for a movie.
+     *
+     * @param id movie id
+     * @return Observable<List<OldMovie>>
+     */
+    public Observable<List<OldMovie>> getReviewsById(String id) {
+
+        return isMobileOnline()
+            .subscribeOn(Schedulers.io())
+            .switchMap(isOnline -> requestUrl(isOnline, NetworkUtils.VIDEO_REVIEWS_URL, null))
             .defaultIfEmpty("") // if empty the default will be "" because the ui needs a response to know how to handle this case
             .map(MovieJsonUtils::getMoviesFromJson);
     }
@@ -37,11 +77,11 @@ public class FetchMovieTask {
      * Requests API url.
      *
      * @param isOnline if internet is available
-     * @param sortType popular or top rated
+     * @param endpoint endpoint to request
      * @param pagination api page
      * @return Observable<String>
      */
-    private Observable<String> requestUrl(Boolean isOnline, int sortType, String pagination) {
+    private Observable<String> requestUrl(Boolean isOnline, String endpoint, String pagination) {
         Log.i(TAG, String.format("Thread requestUrl: %s", Thread.currentThread().getName()));
 
         Observable<String> emptyMovieObservable = Observable.empty();
@@ -50,7 +90,7 @@ public class FetchMovieTask {
             return emptyMovieObservable;
         }
 
-        URL weatherRequestUrl = NetworkUtils.buildUrl(sortType, pagination);
+        URL weatherRequestUrl = NetworkUtils.buildUrl(endpoint, pagination);
 
         try {
             return NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);

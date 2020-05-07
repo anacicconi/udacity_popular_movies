@@ -34,8 +34,26 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    // RecyclerViiew
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
+
+    // Images
     implementation 'com.squareup.picasso:picasso:2.5.2'
+
+    // RXJava
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+
+    // HTTP
+    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.4.1'
+    implementation "com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0"
+
+    // ViewModel
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
+    // LiveDataReactiveStreams
+    implementation "androidx.lifecycle:lifecycle-reactivestreams:2.2.0"
 }

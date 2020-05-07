@@ -8,4 +8,6 @@
     <string name="release_date">Release Date</string>
     <string name="rating">Rating</string>
     <string name="movie_thumbnail">Movie thumbnail</string>
+    <string name="unknown">Unknown</string>
+    <string name="no_rating">No rating</string>
 </resources>

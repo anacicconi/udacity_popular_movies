@@ -49,13 +49,37 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     private void loadMovie(Movie movie) {
-        mTitle.setText(movie.getTitle());
-        mSynopsis.setText(movie.getSynopsis());
-        mReleaseDate.setText(movie.getReleaseDate());
-        mRating.setText(movie.getRating());
+        String title = movie.getTitle();
+        String overview = movie.getOverview();
+        String releaseDate = movie.getReleaseDate();
+        Double voteAverage = movie.getVoteAverage();
+
+        if(null != title) {
+            mTitle.setText(title);
+        } else {
+            mTitle.setText(R.string.unknown);
+        }
+
+        if(null != overview) {
+            mSynopsis.setText(overview);
+        } else {
+            mSynopsis.setText(R.string.unknown);
+        }
+
+        if(null != releaseDate) {
+            mReleaseDate.setText(releaseDate);
+        } else {
+            mReleaseDate.setText(R.string.unknown);
+        }
+
+        if(null != voteAverage) {
+            mRating.setText(String.valueOf(voteAverage));
+        } else {
+            mRating.setText(R.string.no_rating);
+        }
 
         Picasso.with(this)
-            .load(IMAGE_URL + movie.getImage())
+            .load(IMAGE_URL + movie.getPosterPath())
             .placeholder(R.drawable.placeholder)
             .error(R.drawable.placeholder)
             .into(mThumbnail);
