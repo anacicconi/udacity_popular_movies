@@ -76,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                     int visibleItemCount = layoutManager.getChildCount();
                     int totalItemCount = layoutManager.getItemCount();
                     int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
-
                     if (loading) {
                         if ((visibleItemCount + firstVisibleItem) >= totalItemCount) {
                             loading = false;
@@ -102,15 +101,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             .doOnNext(this::loadFinish)
             .subscribe();*/
 
-        /*MovieRepository.getPopularMovies(String.valueOf(pagination))
-            .subscribeOn(Schedulers.io())
-            .doOnNext(i -> Log.i(TAG, String.format("Thread loadMovies 1: %s", Thread.currentThread().getName())))
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext(i -> Log.i(TAG, String.format("Thread loadMovies 2: %s", Thread.currentThread().getName())))
-            .doOnNext(moviesResponse -> loadFinish(moviesResponse.getResults(), moviesResponse.getPage()))
-            .subscribe();*/
-
-        viewModel.setPage(1);
         viewModel.getPopularMovies().observe(this, movies -> {
             Log.i(TAG, "live data changed");
             loadFinish(movies, page);
@@ -124,9 +114,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private void loadFinish(List<Movie> movies, int page) {
         if (!movies.isEmpty()) {
             loading = true;
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
 
-            showMovieData();
+            showMovieView();
 
             mMovieAdapter.setMoviesData(movies, page);
 
@@ -137,7 +126,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
     }
 
-    private void showMovieData() {
+    private void showMovieView() {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
         mErrorMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }

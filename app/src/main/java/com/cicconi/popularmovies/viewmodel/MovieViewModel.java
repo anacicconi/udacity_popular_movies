@@ -17,8 +17,7 @@ public class MovieViewModel extends AndroidViewModel {
     private static final String TAG = MovieViewModel.class.getSimpleName();
 
     private MovieRepository movieRepository;
-    private LiveData<List<Movie>> popularMovies = new MutableLiveData<>();
-    private MutableLiveData<String> filterPage = new MutableLiveData<>();
+    private MutableLiveData<String> filterPage = new MutableLiveData<>("1");
 
     public MovieViewModel(@NonNull Application application) {
         super(application);
@@ -28,14 +27,12 @@ public class MovieViewModel extends AndroidViewModel {
     public LiveData<List<Movie>> getPopularMovies() {
         Log.d(TAG, "Retrieving popular movies started");
 
-        popularMovies = Transformations.switchMap(filterPage,
+        return Transformations.switchMap(filterPage,
             newPage -> LiveDataReactiveStreams.fromPublisher(movieRepository.getPopularMovies(newPage).toFlowable()));
-
-        return popularMovies;
     }
 
     public void setPage(int page) {
-        Log.i(TAG, "new page set");
+        Log.i(TAG, "New page set");
         filterPage.setValue(String.valueOf(page));
     }
 }
