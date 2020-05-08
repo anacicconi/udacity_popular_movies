@@ -18,7 +18,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.cicconi.popularmovies.adapter.MovieAdapter;
-import com.cicconi.popularmovies.async.FetchMovieTask;
 import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.viewmodel.MovieViewModel;
 import java.util.List;
@@ -63,8 +62,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         viewModel = new ViewModelProvider(this).get(MovieViewModel.class);
 
-        loadMovies(FetchMovieTask.SORT_POPULAR, firstPage);
-
+        loadMovies();
         handleRecyclerViewScroll();
     }
 
@@ -90,10 +88,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         });
     }
 
-    private void loadMovies(int sortType, int page) {
+    private void loadMovies() {
         loadStart();
 
-        viewModel.getPopularMovies().observe(this, movies -> {
+        viewModel.getMovies().observe(this, movies -> {
             Log.i(TAG, "movie live data changed");
             loadFinish(movies);
         });
@@ -113,6 +111,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         } else {
             showErrorMessage();
         }
+    }
+
+    private void resetPage() {
+        page = firstPage;
     }
 
     private void incrementPage() {
@@ -155,7 +157,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         int id = item.getItemId();
 
         if (id == R.id.action_sort_popular) {
-            //loadMovies(FetchMovieTask.SORT_POPULAR, firstPage);
+            resetPage();
+            //viewModel.setPage(page);
+            viewModel.setCategory(Constants.SORT_POPULAR);
             mRecyclerView.scrollToPosition(0);
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
@@ -165,7 +169,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
 
         if (id == R.id.action_sort_rating) {
-            //loadMovies(FetchMovieTask.SORT_RATING, firstPage);
+            resetPage();
+            //viewModel.setPage(page);
+            viewModel.setCategory(Constants.SORT_RATING);
             mRecyclerView.scrollToPosition(0);
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
