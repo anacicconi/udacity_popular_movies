@@ -13,6 +13,9 @@ import java.net.SocketAddress;
 import java.net.URL;
 import java.util.List;
 
+/**
+ * DEPRECATED since Retrofit migration
+ */
 public class FetchMovieTask {
 
     private static final String TAG = FetchMovieTask.class.getSimpleName();

@@ -44,8 +44,7 @@
                 style="@style/detail_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_medium"
-                app:layout_constraintStart_toEndOf="@+id/guideline"
+                app:layout_constraintStart_toStartOf="@+id/tv_title_label"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_title_label"
                 tools:text="Pirates des Caraïbes : Jusqu'au bout du monde"
@@ -57,7 +56,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_medium"
                 android:text="@string/synopsis"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@id/iv_thumbnail"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/iv_thumbnail"
                 />
             <TextView
@@ -65,7 +65,7 @@
                 style="@style/detail_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/tv_synopsis_label"
                 app:layout_constraintTop_toBottomOf="@+id/tv_synopsis_label"
                 tools:text="L'âge d'or de la piraterie touche à sa fin. Même le terrifiant Vaisseau Fantôme et son capitaine maudit Davy Jones servent à présent Lord Cutler Beckett et la Compagnie anglaise des Indes Orientales. L'invincible Hollandais Volant écume désormais les sept mers, massacrant sans pitié pirates de tous bords et sabordant leurs navires.
 Will Turner, Elizabeth Swann et le capitaine Barbossa n'ont qu'une seule chance de résister à Beckett et à son armada destructrice : ils doivent rassembler les Neuf Seigneurs de la Cour des Frères, mais l'un des membres les plus éminents, le capitaine Jack Sparrow, manque à l'appel.
@@ -78,7 +78,8 @@ Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_medium"
                 android:text="@string/release_date"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/tv_synopsis"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_synopsis"
                 />
             <TextView
@@ -86,7 +87,8 @@ Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent
                 style="@style/detail_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/tv_release_date_label"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_release_date_label"
                 tools:text="2007-11-23"
                 />
@@ -95,13 +97,12 @@ Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent
                 style="@style/detail_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_medium"
                 android:layout_marginEnd="@dimen/margin_medium"
                 android:gravity="center_vertical"
                 android:text="@string/rating"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/tv_rating"
-                app:layout_constraintTop_toBottomOf="@+id/tv_release_date"
+                app:layout_constraintTop_toTopOf="@+id/tv_rating"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_rating"
                 />
             <TextView
                 android:id="@+id/tv_rating"
@@ -111,7 +112,7 @@ Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent
                 android:textColor="@color/colorAccent"
                 android:textSize="@dimen/rating_text"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_release_date"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="3,8"
                 />
@@ -121,6 +122,25 @@ Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintGuide_begin="120dp"
+                />
+            <TextView
+                android:id="@+id/tv_videos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="video"
+                app:layout_constraintTop_toBottomOf="@+id/tv_rating"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+            <TextView
+                android:id="@+id/tv_reviews"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="review"
+                app:layout_constraintTop_toBottomOf="@+id/tv_videos"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

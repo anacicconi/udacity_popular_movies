@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.cicconi.popularmovies.adapter.MovieAdapter;
 import com.cicconi.popularmovies.model.Movie;
-import com.cicconi.popularmovies.viewmodel.MovieViewModel;
+import com.cicconi.popularmovies.viewmodel.MainViewModel;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener {
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private MovieAdapter mMovieAdapter;
     private GridLayoutManager layoutManager;
 
-    private MovieViewModel viewModel;
+    private MainViewModel viewModel;
 
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessage;
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mMovieAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        viewModel = new ViewModelProvider(this).get(MovieViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         loadMovies();
         handleRecyclerViewScroll();

@@ -14,15 +14,15 @@ import com.cicconi.popularmovies.repository.MovieRepository;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import java.util.List;
 
-public class MovieViewModel extends AndroidViewModel {
+public class MainViewModel extends AndroidViewModel {
 
-    private static final String TAG = MovieViewModel.class.getSimpleName();
+    private static final String TAG = MainViewModel.class.getSimpleName();
 
     private MovieRepository movieRepository;
     private MutableLiveData<Integer> page = new MutableLiveData<>(1);
     private MutableLiveData<Integer> category = new MutableLiveData<>(Constants.SORT_POPULAR);
 
-    public MovieViewModel(@NonNull Application application) {
+    public MainViewModel(@NonNull Application application) {
         super(application);
         movieRepository = new MovieRepository();
     }
