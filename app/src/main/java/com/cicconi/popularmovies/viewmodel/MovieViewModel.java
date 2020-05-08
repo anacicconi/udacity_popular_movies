@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.repository.MovieRepository;
+import io.reactivex.rxjava3.core.BackpressureStrategy;
 import java.util.List;
 
 public class MovieViewModel extends AndroidViewModel {
@@ -28,7 +29,11 @@ public class MovieViewModel extends AndroidViewModel {
         Log.d(TAG, "Retrieving popular movies started");
 
         return Transformations.switchMap(filterPage,
-            newPage -> LiveDataReactiveStreams.fromPublisher(movieRepository.getPopularMovies(newPage).toFlowable()));
+            newPage -> LiveDataReactiveStreams.fromPublisher(
+                movieRepository.getPopularMovies(newPage)
+                    .toFlowable(BackpressureStrategy.BUFFER)
+            )
+        );
     }
 
     public void setPage(int page) {

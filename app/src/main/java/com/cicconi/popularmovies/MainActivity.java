@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             .subscribe();*/
 
         viewModel.getPopularMovies().observe(this, movies -> {
-            Log.i(TAG, "live data changed");
+            Log.i(TAG, "live data changed, page: " + page);
             loadFinish(movies, page);
         });
     }
