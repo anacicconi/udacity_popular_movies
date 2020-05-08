@@ -80,8 +80,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                         if ((visibleItemCount + firstVisibleItem) >= totalItemCount) {
                             loading = false;
                             if(page != lastPage) {
-                                page = page + 1;
-                                //loadMovies(FetchMovieTask.SORT_POPULAR, page);
+                                incrementPage();
                                 viewModel.setPage(page);
                             }
                         }
@@ -94,16 +93,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private void loadMovies(int sortType, int page) {
         loadStart();
 
-        /*new FetchMovieTask().getMovies(sortType, String.valueOf(pagination))
-            .doOnNext(i -> Log.i(TAG, String.format("Thread loadMovies 1: %s", Thread.currentThread().getName())))
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext(i -> Log.i(TAG, String.format("Thread loadMovies 2: %s", Thread.currentThread().getName())))
-            .doOnNext(this::loadFinish)
-            .subscribe();*/
-
         viewModel.getPopularMovies().observe(this, movies -> {
-            Log.i(TAG, "live data changed, page: " + page);
-            loadFinish(movies, page);
+            Log.i(TAG, "movie live data changed");
+            loadFinish(movies);
         });
     }
 
@@ -111,19 +103,20 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
-    private void loadFinish(List<Movie> movies, int page) {
+    private void loadFinish(List<Movie> movies) {
         if (!movies.isEmpty()) {
             loading = true;
 
             showMovieView();
 
             mMovieAdapter.setMoviesData(movies, page);
-
-            //mRecyclerView.post(() -> mMovieAdapter.setMoviesData(movies, page));
-
         } else {
             showErrorMessage();
         }
+    }
+
+    private void incrementPage() {
+        page = page + 1;
     }
 
     private void showMovieView() {
