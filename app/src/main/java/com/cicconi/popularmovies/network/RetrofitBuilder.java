@@ -1,4 +1,4 @@
-package com.cicconi.popularmovies.Network;
+package com.cicconi.popularmovies.network;
 
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory;
 import okhttp3.OkHttpClient;

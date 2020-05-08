@@ -1,4 +1,4 @@
-package com.cicconi.popularmovies.Network;
+package com.cicconi.popularmovies.network;
 
 import com.cicconi.popularmovies.model.MoviesResponse;
 import io.reactivex.rxjava3.core.Single;
