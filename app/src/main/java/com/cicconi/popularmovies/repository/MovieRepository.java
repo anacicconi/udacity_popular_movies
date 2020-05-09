@@ -19,7 +19,7 @@ public class MovieRepository {
     private static final String TAG = MovieRepository.class.getSimpleName();
 
     //TODO: add your api key
-    private static final String API_KEY = "3033d03f5ccf66a68781fd526cfbe685";
+    private static final String API_KEY = "";
 
     public Observable<List<Movie>> getMovies(String page, int category) {
         if(category == Constants.SORT_POPULAR) {

@@ -10,4 +10,6 @@
     <string name="movie_thumbnail">Movie thumbnail</string>
     <string name="unknown">Unknown</string>
     <string name="no_rating">No rating</string>
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
 </resources>

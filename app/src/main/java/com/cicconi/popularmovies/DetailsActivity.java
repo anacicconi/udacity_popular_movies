@@ -1,6 +1,7 @@
 package com.cicconi.popularmovies;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -9,11 +10,15 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.cicconi.popularmovies.adapter.ReviewAdapter;
+import com.cicconi.popularmovies.adapter.VideoAdapter;
 import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.viewmodel.DetailViewModel;
 import com.squareup.picasso.Picasso;
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity implements VideoAdapter.VideoClickListener {
 
     private static final String TAG = DetailsActivity.class.getSimpleName();
 
@@ -25,8 +30,8 @@ public class DetailsActivity extends AppCompatActivity {
     private TextView mReleaseDate;
     private TextView mRating;
     private ImageView mThumbnail;
-    private TextView mVideo;
-    private TextView mReview;
+    private TextView mVideosLabel;
+    private TextView mReviewsLabel;
 
     private DetailViewModel viewModel;
 
@@ -40,8 +45,8 @@ public class DetailsActivity extends AppCompatActivity {
         mReleaseDate = findViewById(R.id.tv_release_date);
         mRating = findViewById(R.id.tv_rating);
         mThumbnail = findViewById(R.id.iv_thumbnail);
-        mVideo = findViewById(R.id.tv_videos);
-        mReview = findViewById(R.id.tv_reviews);
+        mVideosLabel = findViewById(R.id.tv_videos);
+        mReviewsLabel = findViewById(R.id.tv_reviews);
 
         ScrollView mMovieLayout = findViewById(R.id.movie_layout);
         TextView mErrorMessage = findViewById(R.id.tv_error_message);
@@ -57,21 +62,14 @@ public class DetailsActivity extends AppCompatActivity {
                 mErrorMessage.setVisibility(View.VISIBLE);
             } else {
                 loadMovie(movie);
+                loadVideos(movie.getId());
+                loadReviews(movie.getId());
             }
         }
+
     }
 
     private void loadMovie(Movie movie) {
-        viewModel.getVideos(movie.getId()).observe(this, videos -> {
-            Log.i(TAG, "video live data changed: " + videos.get(0).getName());
-            mVideo.setText(videos.get(0).getName());
-        });
-
-        viewModel.getReviews(movie.getId()).observe(this, reviews -> {
-            Log.i(TAG, "review live data changed: " + reviews.get(0).getAuthor());
-            mReview.setText(reviews.get(0).getAuthor());
-        });
-
         String title = movie.getTitle();
         String overview = movie.getOverview();
         String releaseDate = movie.getReleaseDate();
@@ -106,5 +104,53 @@ public class DetailsActivity extends AppCompatActivity {
             .placeholder(R.drawable.placeholder)
             .error(R.drawable.placeholder)
             .into(mThumbnail);
+    }
+
+    private void loadVideos(Integer videoId) {
+        RecyclerView mVideoRecyclerView = findViewById(R.id.recyclerview_videos);
+        LinearLayoutManager videoLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mVideoRecyclerView.setLayoutManager(videoLayoutManager);
+        mVideoRecyclerView.setHasFixedSize(true);
+
+        VideoAdapter mVideoAdapter = new VideoAdapter(this);
+        mVideoRecyclerView.setAdapter(mVideoAdapter);
+
+        viewModel.getVideos(videoId).observe(this, videos -> {
+            Log.i(TAG, "video live data changed");
+            if (!videos.isEmpty()) {
+                mVideosLabel.setVisibility(View.VISIBLE);
+                mVideoAdapter.setVideoData(videos);
+            }
+        });
+    }
+
+    private void loadReviews(Integer videoId) {
+        RecyclerView mReviewRecyclerView = findViewById(R.id.recyclerview_reviews);
+        LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mReviewRecyclerView.setLayoutManager(reviewLayoutManager);
+        mReviewRecyclerView.setHasFixedSize(true);
+
+        ReviewAdapter mReviewAdapter = new ReviewAdapter();
+        mReviewRecyclerView.setAdapter(mReviewAdapter);
+
+        viewModel.getReviews(videoId).observe(this, reviews -> {
+            Log.i(TAG, "video live data changed");
+            if (!reviews.isEmpty()) {
+                mReviewsLabel.setVisibility(View.VISIBLE);
+                mReviewAdapter.setReviewData(reviews);
+            }
+        });
+    }
+
+    @Override
+    public void onVideoClick(String videoKey) {
+        String url = Constants.YOUTUBE_URL + videoKey;
+        Uri webPage = Uri.parse(url);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, webPage);
+
+        if(intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 }

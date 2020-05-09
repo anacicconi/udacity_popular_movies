@@ -2,6 +2,9 @@ package com.cicconi.popularmovies.model;
 
 import java.io.Serializable;
 
+/**
+ * DEPRECATED since Retrofit migration
+ */
 public class OldMovie implements Serializable {
     private final String title;
     private final String image;

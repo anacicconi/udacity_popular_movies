@@ -186,13 +186,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void enableMenuItem(MenuItem item) {
         SpannableString spanString = new SpannableString(item.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(Color.WHITE), 0, spanString.length(), 0);
+        spanString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorWhite)), 0, spanString.length(), 0);
         item.setTitle(spanString);
     }
 
     private void disableMenuItem(MenuItem item) {
         SpannableString spanString = new SpannableString(item.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(Color.GRAY), 0, spanString.length(), 0);
+        spanString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimaryLight)), 0, spanString.length(), 0);
         item.setTitle(spanString);
     }
 }
