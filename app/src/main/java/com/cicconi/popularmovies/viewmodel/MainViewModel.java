@@ -6,8 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.LiveDataReactiveStreams;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
+import androidx.lifecycle.MediatorLiveData;
 import com.cicconi.popularmovies.Constants;
 import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.repository.MovieRepository;
@@ -19,43 +18,34 @@ public class MainViewModel extends AndroidViewModel {
     private static final String TAG = MainViewModel.class.getSimpleName();
 
     private MovieRepository movieRepository;
-    private MutableLiveData<Integer> page = new MutableLiveData<>(1);
-    private MutableLiveData<Integer> category = new MutableLiveData<>(Constants.SORT_POPULAR);
+
+    // Had to use a MediatorLiveData because the LiveDataReactiveStreams does not accept a MutableLiveData
+    private MediatorLiveData<List<Movie>> movies = new MediatorLiveData<>();
 
     public MainViewModel(@NonNull Application application) {
         super(application);
         movieRepository = new MovieRepository();
+
+        Log.d(TAG, "Initializing movies list");
+
+        movies.addSource(
+            LiveDataReactiveStreams.fromPublisher(
+                movieRepository.getMovies(String.valueOf(1), Constants.SORT_POPULAR)
+                    .toFlowable(BackpressureStrategy.BUFFER)
+            ), value -> movies.setValue(value));
     }
 
     public LiveData<List<Movie>> getMovies() {
-        MovieLiveData trigger = new MovieLiveData(page, category);
-
-        return Transformations.switchMap(trigger,
-            movieFilter -> LiveDataReactiveStreams.fromPublisher(
-                movieRepository.getMovies(String.valueOf(movieFilter.getPage()), movieFilter.getCategory())
-                    .toFlowable(BackpressureStrategy.BUFFER)
-            ));
+        return movies;
     }
 
-    /*public LiveData<List<Movie>> getPopularMovies() {
-        Log.d(TAG, "Retrieving popular movies started");
+    public void updateMoviesList(int page, int category) {
+        Log.d(TAG, String.format("Updating movies list with page %d and category %d", page, category));
 
-        return Transformations.switchMap(page,
-            newPage -> LiveDataReactiveStreams.fromPublisher(
-                movieRepository.getPopularMovies(newPage)
+        movies.addSource(
+            LiveDataReactiveStreams.fromPublisher(
+                movieRepository.getMovies(String.valueOf(page), category)
                     .toFlowable(BackpressureStrategy.BUFFER)
-            )
-        );
-    }*/
-
-    public void setPage(int value) {
-        Log.i(TAG, String.format("New page set: %d", value));
-        page.setValue(value);
-    }
-
-    public void setCategory(int value) {
-        Log.i(TAG, String.format("New category set %d", value));
-        page.setValue(1);
-        category.setValue(value);
+            ), value -> movies.setValue(value));
     }
 }

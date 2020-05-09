@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     final private int firstPage = 1;
     final private int lastPage = 50;
     private int page = firstPage;
+    private int category = Constants.SORT_POPULAR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                             loading = false;
                             if(page != lastPage) {
                                 incrementPage();
-                                viewModel.setPage(page);
+                                viewModel.updateMoviesList(page, category);
                             }
                         }
                     }
@@ -105,20 +106,24 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         if (!movies.isEmpty()) {
             loading = true;
 
-            showMovieView();
+            if(page == firstPage) {
+                mRecyclerView.scrollToPosition(0);
+            }
 
+            showMovieView();
             mMovieAdapter.setMoviesData(movies, page);
         } else {
             showErrorMessage();
         }
     }
 
-    private void resetPage() {
-        page = firstPage;
-    }
-
     private void incrementPage() {
         page = page + 1;
+    }
+
+    private void updateCategory(int newCategory) {
+        page = firstPage;
+        category = newCategory;
     }
 
     private void showMovieView() {
@@ -157,10 +162,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         int id = item.getItemId();
 
         if (id == R.id.action_sort_popular) {
-            resetPage();
-            //viewModel.setPage(page);
-            viewModel.setCategory(Constants.SORT_POPULAR);
-            mRecyclerView.scrollToPosition(0);
+            updateCategory(Constants.SORT_POPULAR);
+            viewModel.updateMoviesList(page, category);
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
             disableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
@@ -169,10 +172,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
 
         if (id == R.id.action_sort_rating) {
-            resetPage();
-            //viewModel.setPage(page);
-            viewModel.setCategory(Constants.SORT_RATING);
-            mRecyclerView.scrollToPosition(0);
+            updateCategory(Constants.SORT_RATING);
+            viewModel.updateMoviesList(page, category);
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
             disableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));

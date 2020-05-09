@@ -19,7 +19,7 @@ public class MovieRepository {
     private static final String TAG = MovieRepository.class.getSimpleName();
 
     //TODO: add your api key
-    private static final String API_KEY = "";
+    private static final String API_KEY = "3033d03f5ccf66a68781fd526cfbe685";
 
     public Observable<List<Movie>> getMovies(String page, int category) {
         if(category == Constants.SORT_POPULAR) {
@@ -51,7 +51,7 @@ public class MovieRepository {
     private Observable<List<Movie>> getTopRatedMovies(String page) {
         return RetrofitBuilder.getClient().getTopRatedMovies(API_KEY, page)
             .subscribeOn(Schedulers.io())
-            .doOnSubscribe(i -> Log.d(TAG, String.format("Thread getTopRatedMovies: %s", Thread.currentThread().getName())))
+            .doOnNext(i -> Log.d(TAG, String.format("Thread getTopRatedMovies: %s", Thread.currentThread().getName())))
             .onErrorReturn(e -> getEmptyMovieResponse())
             .map(moviesResponse -> {
                 if(moviesResponse.getResults() != null) {
