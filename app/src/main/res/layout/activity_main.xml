@@ -21,6 +21,15 @@
         android:textSize="@dimen/subtitle_text"
         android:visibility="invisible" />
 
+    <TextView
+        android:id="@+id/tv_no_results_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_medium"
+        android:text="@string/no_results_message"
+        android:textSize="@dimen/subtitle_text"
+        android:visibility="invisible" />
+
     <ProgressBar
         android:id="@+id/pb_loading_indicator"
         android:layout_height="@dimen/loader_size"

@@ -1,6 +1,7 @@
 package com.cicconi.popularmovies.viewmodel;
 
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -20,7 +21,8 @@ public class DetailViewModel extends AndroidViewModel {
 
     public DetailViewModel(@NonNull Application application) {
         super(application);
-        movieRepository = new MovieRepository();
+        Context context = getApplication().getApplicationContext();
+        movieRepository = new MovieRepository(context);
     }
 
     public LiveData<List<Video>> getVideos(int id) {

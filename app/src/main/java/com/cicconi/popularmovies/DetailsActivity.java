@@ -173,35 +173,33 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
     }
 
     private void onFavoriteIconClick() {
-        mFavoriteIcon.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                mFavoriteIcon.setColorFilter(getResources().getColor(R.color.colorFavorite));
+        mFavoriteIcon.setOnClickListener(view -> {
+            mFavoriteIcon.setColorFilter(getResources().getColor(R.color.colorFavorite));
 
-                FavoriteMovie favoriteMovie = new FavoriteMovie(
-                    movie.getId(),
-                    movie.getOriginalTitle(),
-                    movie.getOverview(),
-                    movie.getReleaseDate(),
-                    movie.getPopularity(),
-                    movie.getPosterPath()
+            FavoriteMovie favoriteMovie = new FavoriteMovie(
+                movie.getId(),
+                movie.getOriginalTitle(),
+                movie.getOverview(),
+                movie.getReleaseDate(),
+                movie.getPopularity(),
+                movie.getPosterPath()
+            );
+
+            Completable query = mDb.favoriteMovieDAO().insertFavoriteMovie(favoriteMovie);
+
+            Disposable disposable = query
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(e -> {
+                    e.printStackTrace();
+                    Toast.makeText(DetailsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                })
+                .subscribe(
+                    () -> Log.d(TAG, "New favorite movie saved"),
+                    Throwable::printStackTrace
                 );
 
-                Completable query = mDb.favoriteMovieDAO().insertFavoriteMovie(favoriteMovie);
-
-                Disposable disposable = query
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnError(e -> {
-                        e.printStackTrace();
-                        Toast.makeText(DetailsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
-                    })
-                    .subscribe(
-                        () -> Log.d(TAG, "New favorite movie saved"),
-                        Throwable::printStackTrace
-                    );
-
-                compositeDisposable.add(disposable);
-            }
+            compositeDisposable.add(disposable);
         });
     }
 

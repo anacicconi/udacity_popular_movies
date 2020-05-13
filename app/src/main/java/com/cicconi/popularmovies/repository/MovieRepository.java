@@ -1,7 +1,11 @@
 package com.cicconi.popularmovies.repository;
 
+import android.content.Context;
 import android.util.Log;
+import androidx.lifecycle.LiveData;
 import com.cicconi.popularmovies.Constants;
+import com.cicconi.popularmovies.database.AppDatabase;
+import com.cicconi.popularmovies.database.FavoriteMovie;
 import com.cicconi.popularmovies.model.Review;
 import com.cicconi.popularmovies.model.ReviewResponse;
 import com.cicconi.popularmovies.model.Video;
@@ -18,8 +22,14 @@ public class MovieRepository {
 
     private static final String TAG = MovieRepository.class.getSimpleName();
 
+    private static AppDatabase mDb;
+
     //TODO: add your api key
-    private static final String API_KEY = "3033d03f5ccf66a68781fd526cfbe685";
+    private static final String API_KEY = "";
+
+    public MovieRepository(Context context) {
+        mDb = AppDatabase.getInstance(context);
+    }
 
     public Observable<List<Movie>> getMovies(String page, int category) {
         if(category == Constants.SORT_POPULAR) {
@@ -60,6 +70,10 @@ public class MovieRepository {
 
                 return getEmptyMovieList();
             });
+    }
+
+    public LiveData<List<FavoriteMovie>> getFavoriteMovies() {
+        return mDb.favoriteMovieDAO().loadAllFavoriteMovies();
     }
 
     public Observable<List<Video>> getVideosById(int movieId) {

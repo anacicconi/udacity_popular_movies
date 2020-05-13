@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessage;
+    private TextView mNoResultsMessage;
 
     private Menu mMainMenu;
 
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
         mErrorMessage = findViewById(R.id.tv_error_message);
+        mNoResultsMessage = findViewById(R.id.tv_no_results_message);
         mRecyclerView = findViewById(R.id.recyclerview_movies);
 
         layoutManager = new GridLayoutManager(this, NUMBER_OF_COLUMNS, GridLayoutManager.VERTICAL, false);
@@ -126,13 +128,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private void showMovieView() {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         mErrorMessage.setVisibility(View.INVISIBLE);
+        mNoResultsMessage.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
     private void showErrorMessage() {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
-        mErrorMessage.setVisibility(View.VISIBLE);
+
+        if(category == Constants.SORT_FAVORITE) {
+            mNoResultsMessage.setVisibility(View.VISIBLE);
+        } else {
+            mErrorMessage.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -150,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         enableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
         disableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
+        disableMenuItem(mMainMenu.findItem(R.id.action_sort_favorite));
 
         return true;
     }
@@ -164,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
             disableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
+            disableMenuItem(mMainMenu.findItem(R.id.action_sort_favorite));
 
             return true;
         }
@@ -174,6 +184,18 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
             disableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
+            disableMenuItem(mMainMenu.findItem(R.id.action_sort_favorite));
+
+            return true;
+        }
+
+        if (id == R.id.action_sort_favorite) {
+            updateCategory(Constants.SORT_FAVORITE);
+            viewModel.setMoviesList(page, category);
+
+            enableMenuItem(mMainMenu.findItem(R.id.action_sort_favorite));
+            disableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
+            disableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
 
             return true;
         }
@@ -183,13 +205,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void enableMenuItem(MenuItem item) {
         SpannableString spanString = new SpannableString(item.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorWhite)), 0, spanString.length(), 0);
+        spanString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorAccent)), 0, spanString.length(), 0);
         item.setTitle(spanString);
     }
 
     private void disableMenuItem(MenuItem item) {
         SpannableString spanString = new SpannableString(item.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimaryLight)), 0, spanString.length(), 0);
+        spanString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorSecondaryText)), 0, spanString.length(), 0);
         item.setTitle(spanString);
     }
 }
