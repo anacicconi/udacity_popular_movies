@@ -1,7 +1,6 @@
 package com.cicconi.popularmovies;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;

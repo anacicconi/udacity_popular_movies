@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.lifecycle.ViewModelProvider;
@@ -14,9 +15,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.cicconi.popularmovies.adapter.ReviewAdapter;
 import com.cicconi.popularmovies.adapter.VideoAdapter;
+import com.cicconi.popularmovies.database.AppDatabase;
+import com.cicconi.popularmovies.database.FavoriteMovie;
 import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.viewmodel.DetailViewModel;
 import com.squareup.picasso.Picasso;
+import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class DetailsActivity extends AppCompatActivity implements VideoAdapter.VideoClickListener {
 
@@ -29,8 +37,15 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
     private ImageView mThumbnail;
     private TextView mVideosLabel;
     private TextView mReviewsLabel;
+    private ImageView mFavoriteIcon;
 
     private DetailViewModel viewModel;
+
+    private AppDatabase mDb;
+
+    private Movie movie;
+
+    private CompositeDisposable compositeDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,15 +59,20 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
         mThumbnail = findViewById(R.id.iv_thumbnail);
         mVideosLabel = findViewById(R.id.tv_videos);
         mReviewsLabel = findViewById(R.id.tv_reviews);
+        mFavoriteIcon = findViewById(R.id.iv_favorite);
 
         ScrollView mMovieLayout = findViewById(R.id.movie_layout);
         TextView mErrorMessage = findViewById(R.id.tv_error_message);
+
+        compositeDisposable = new CompositeDisposable();
+
+        mDb = AppDatabase.getInstance(getApplicationContext());
 
         viewModel = new ViewModelProvider(this).get(DetailViewModel.class);
 
         Intent intent = getIntent();
         if (intent.hasExtra(Constants.EXTRA_MOVIE)) {
-            Movie movie = (Movie) intent.getExtras().getSerializable(Constants.EXTRA_MOVIE);
+            movie = (Movie) intent.getExtras().getSerializable(Constants.EXTRA_MOVIE);
 
             if(null == movie) {
                 mMovieLayout.setVisibility(View.GONE);
@@ -61,6 +81,7 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
                 loadMovie(movie);
                 loadVideos(movie.getId());
                 loadReviews(movie.getId());
+                onFavoriteIconClick();
             }
         }
 
@@ -149,5 +170,44 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
         if(intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         }
+    }
+
+    private void onFavoriteIconClick() {
+        mFavoriteIcon.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                mFavoriteIcon.setColorFilter(getResources().getColor(R.color.colorFavorite));
+
+                FavoriteMovie favoriteMovie = new FavoriteMovie(
+                    movie.getId(),
+                    movie.getOriginalTitle(),
+                    movie.getOverview(),
+                    movie.getReleaseDate(),
+                    movie.getPopularity(),
+                    movie.getPosterPath()
+                );
+
+                Completable query = mDb.favoriteMovieDAO().insertFavoriteMovie(favoriteMovie);
+
+                Disposable disposable = query
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(e -> {
+                        e.printStackTrace();
+                        Toast.makeText(DetailsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    })
+                    .subscribe(
+                        () -> Log.d(TAG, "New favorite movie saved"),
+                        Throwable::printStackTrace
+                    );
+
+                compositeDisposable.add(disposable);
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        compositeDisposable.dispose();
     }
 }

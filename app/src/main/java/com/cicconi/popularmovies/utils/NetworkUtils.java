@@ -2,7 +2,7 @@ package com.cicconi.popularmovies.utils;
 
 import android.net.Uri;
 import android.util.Log;
-import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.Observable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;

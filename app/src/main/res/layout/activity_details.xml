@@ -33,10 +33,11 @@
                 style="@style/detail_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_medium"
+                android:layout_marginStart="@dimen/margin_small"
+                android:layout_marginEnd="@dimen/margin_small"
                 android:text="@string/original_title"
                 app:layout_constraintStart_toEndOf="@+id/guideline"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/guideline2"
                 app:layout_constraintTop_toTopOf="parent"
                 />
             <TextView
@@ -45,9 +46,19 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="@+id/tv_title_label"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/guideline2"
                 app:layout_constraintTop_toBottomOf="@+id/tv_title_label"
                 tools:text="Pirates des Caraïbes : Jusqu'au bout du monde"
+                />
+            <ImageView
+                android:id="@+id/iv_favorite"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_star_24dp"
+                android:adjustViewBounds="true"
+                app:layout_constraintTop_toTopOf="@+id/tv_title_label"
+                app:layout_constraintStart_toEndOf="@+id/guideline2"
+                app:layout_constraintEnd_toEndOf="parent"
                 />
             <TextView
                 android:id="@+id/tv_synopsis_label"
@@ -122,6 +133,13 @@ Will, Elizabeth et Barbossa, secondés par Tia Dalma, Pintel et Ragetti, doivent
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintGuide_begin="120dp"
+                />
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="320dp"
                 />
 
             <!--<include

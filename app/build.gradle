@@ -43,19 +43,28 @@ dependencies {
     // Images
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
-    // RXJava
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    // RXJava (Room only supports RXJava 2 so have to sick with this)
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.17'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
     // HTTP
     implementation 'com.squareup.retrofit2:retrofit:2.8.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.4.1'
-    implementation "com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0"
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.2'
+    // If we were using RXJava 3
+    //implementation "com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0"
 
     // ViewModel
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
     // LiveDataReactiveStreams
     implementation "androidx.lifecycle:lifecycle-reactivestreams:2.2.0"
+
+    // Room
+    implementation "androidx.room:room-runtime:2.2.5"
+    annotationProcessor "androidx.room:room-compiler:2.2.5"
+
+    // Room - RxJava support
+    implementation "androidx.room:room-rxjava2:2.2.5"
 }

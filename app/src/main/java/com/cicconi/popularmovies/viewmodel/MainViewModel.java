@@ -10,7 +10,7 @@ import androidx.lifecycle.MediatorLiveData;
 import com.cicconi.popularmovies.Constants;
 import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.repository.MovieRepository;
-import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.BackpressureStrategy;
 import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {

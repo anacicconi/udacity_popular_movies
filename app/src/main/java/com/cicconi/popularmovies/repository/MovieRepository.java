@@ -9,8 +9,8 @@ import com.cicconi.popularmovies.model.VideoResponse;
 import com.cicconi.popularmovies.network.RetrofitBuilder;
 import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.model.MovieResponse;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class MovieRepository {
     private static final String TAG = MovieRepository.class.getSimpleName();
 
     //TODO: add your api key
-    private static final String API_KEY = "";
+    private static final String API_KEY = "3033d03f5ccf66a68781fd526cfbe685";
 
     public Observable<List<Movie>> getMovies(String page, int category) {
         if(category == Constants.SORT_POPULAR) {

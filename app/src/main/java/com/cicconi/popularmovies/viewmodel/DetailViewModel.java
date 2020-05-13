@@ -9,7 +9,7 @@ import androidx.lifecycle.LiveDataReactiveStreams;
 import com.cicconi.popularmovies.model.Review;
 import com.cicconi.popularmovies.model.Video;
 import com.cicconi.popularmovies.repository.MovieRepository;
-import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.BackpressureStrategy;
 import java.util.List;
 
 public class DetailViewModel extends AndroidViewModel {
