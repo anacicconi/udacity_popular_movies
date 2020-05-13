@@ -28,18 +28,14 @@ public class MainViewModel extends AndroidViewModel {
 
         Log.d(TAG, "Initializing movies list");
 
-        movies.addSource(
-            LiveDataReactiveStreams.fromPublisher(
-                movieRepository.getMovies(String.valueOf(1), Constants.SORT_POPULAR)
-                    .toFlowable(BackpressureStrategy.BUFFER)
-            ), value -> movies.setValue(value));
+        setMoviesList(Constants.FIRST_PAGE, Constants.SORT_POPULAR);
     }
 
     public LiveData<List<Movie>> getMovies() {
         return movies;
     }
 
-    public void updateMoviesList(int page, int category) {
+    public void setMoviesList(int page, int category) {
         Log.d(TAG, String.format("Updating movies list with page %d and category %d", page, category));
 
         movies.addSource(

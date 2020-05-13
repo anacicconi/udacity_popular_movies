@@ -22,9 +22,6 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
 
     private static final String TAG = DetailsActivity.class.getSimpleName();
 
-    private static final String EXTRA_MOVIE = "movie";
-    private static final String IMAGE_URL = "https://image.tmdb.org/t/p/w185";
-
     private TextView mTitle;
     private TextView mSynopsis;
     private TextView mReleaseDate;
@@ -54,8 +51,8 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
         viewModel = new ViewModelProvider(this).get(DetailViewModel.class);
 
         Intent intent = getIntent();
-        if (intent.hasExtra(EXTRA_MOVIE)) {
-            Movie movie = (Movie) intent.getExtras().getSerializable(EXTRA_MOVIE);
+        if (intent.hasExtra(Constants.EXTRA_MOVIE)) {
+            Movie movie = (Movie) intent.getExtras().getSerializable(Constants.EXTRA_MOVIE);
 
             if(null == movie) {
                 mMovieLayout.setVisibility(View.GONE);
@@ -100,7 +97,7 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
         }
 
         Picasso.with(this)
-            .load(IMAGE_URL + movie.getPosterPath())
+            .load(Constants.IMAGE_URL + movie.getPosterPath())
             .placeholder(R.drawable.placeholder)
             .error(R.drawable.placeholder)
             .into(mThumbnail);

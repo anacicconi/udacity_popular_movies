@@ -14,7 +14,7 @@ import java.util.List;
 
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoAdapterViewHolder> {
 
-    VideoClickListener mClickListener;
+    private VideoClickListener mClickListener;
 
     private List<Video> mVideoData  = new ArrayList<>();
 

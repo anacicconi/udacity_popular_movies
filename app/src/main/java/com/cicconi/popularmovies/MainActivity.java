@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int NUMBER_OF_COLUMNS = 2;
-    private static final String EXTRA_MOVIE = "movie";
 
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
@@ -40,9 +39,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private Menu mMainMenu;
 
     private boolean loading = true;
-    final private int firstPage = 1;
     final private int lastPage = 50;
-    private int page = firstPage;
+    private int page = Constants.FIRST_PAGE;
     private int category = Constants.SORT_POPULAR;
 
     @Override
@@ -80,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                             loading = false;
                             if(page != lastPage) {
                                 incrementPage();
-                                viewModel.updateMoviesList(page, category);
+                                viewModel.setMoviesList(page, category);
                             }
                         }
                     }
@@ -106,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         if (!movies.isEmpty()) {
             loading = true;
 
-            if(page == firstPage) {
+            if(page == Constants.FIRST_PAGE) {
                 mRecyclerView.scrollToPosition(0);
             }
 
@@ -122,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     private void updateCategory(int newCategory) {
-        page = firstPage;
+        page = Constants.FIRST_PAGE;
         category = newCategory;
     }
 
@@ -141,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     @Override
     public void onMovieItemClick(Movie movie) {
         Intent startChildActivityIntent = new Intent(this, DetailsActivity.class);
-        startChildActivityIntent.putExtra(EXTRA_MOVIE, movie);
+        startChildActivityIntent.putExtra(Constants.EXTRA_MOVIE, movie);
         startActivity(startChildActivityIntent);
     }
 
@@ -163,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         if (id == R.id.action_sort_popular) {
             updateCategory(Constants.SORT_POPULAR);
-            viewModel.updateMoviesList(page, category);
+            viewModel.setMoviesList(page, category);
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
             disableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
@@ -173,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         if (id == R.id.action_sort_rating) {
             updateCategory(Constants.SORT_RATING);
-            viewModel.updateMoviesList(page, category);
+            viewModel.setMoviesList(page, category);
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
             disableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));

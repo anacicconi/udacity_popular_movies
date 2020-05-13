@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.cicconi.popularmovies.Constants;
 import com.cicconi.popularmovies.R;
 import com.cicconi.popularmovies.model.Movie;
 import com.squareup.picasso.Picasso;
@@ -14,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
-
-    private static final String IMAGE_URL = "https://image.tmdb.org/t/p/w185";
 
     private Context context;
 
@@ -51,7 +50,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         Movie movie = mMovies.get(position);
 
         Picasso.with(context)
-            .load(IMAGE_URL + movie.getPosterPath())
+            .load(Constants.IMAGE_URL + movie.getPosterPath())
             .placeholder(R.drawable.placeholder)
             .error(R.drawable.placeholder)
             .into(holder.mMovieImageView);
