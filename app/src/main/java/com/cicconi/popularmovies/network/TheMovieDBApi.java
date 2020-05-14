@@ -21,8 +21,8 @@ public interface TheMovieDBApi {
     Observable<MovieResponse> getTopRatedMovies(@Query(API_KEY_PARAM) String apiKey, @Query(PAGINATION_PARAM) String page);
 
     @GET("movie/{id}/videos")
-    Observable<VideoResponse> getMovieVideos(@Path(ID) int id, @Query(API_KEY_PARAM) String apiKey);
+    Observable<VideoResponse> getMovieVideos(@Path(ID) int movieApiId, @Query(API_KEY_PARAM) String apiKey);
 
     @GET("movie/{id}/reviews")
-    Observable<ReviewResponse> getMovieReviews(@Path(ID) int id, @Query(API_KEY_PARAM) String apiKey);
+    Observable<ReviewResponse> getMovieReviews(@Path(ID) int movieApiId, @Query(API_KEY_PARAM) String apiKey);
 }

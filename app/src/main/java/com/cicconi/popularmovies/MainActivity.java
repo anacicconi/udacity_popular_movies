@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cicconi.popularmovies.adapter.MovieAdapter;
 import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.viewmodel.MainViewModel;
+import com.facebook.stetho.Stetho;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener {
@@ -41,10 +42,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private boolean loading = true;
     final private int lastPage = 50;
     private int page = Constants.FIRST_PAGE;
-    private int category = Constants.SORT_POPULAR;
+    private MovieCategory category = MovieCategory.POPULAR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Stetho.initializeWithDefaults(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -70,20 +73,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0) {
-                    int visibleItemCount = layoutManager.getChildCount();
-                    int totalItemCount = layoutManager.getItemCount();
-                    int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
-                    if (loading) {
-                        if ((visibleItemCount + firstVisibleItem) >= totalItemCount) {
-                            loading = false;
-                            if(page != lastPage) {
-                                incrementPage();
-                                viewModel.setMoviesList(page, category);
-                            }
+            if (dy > 0) {
+                int visibleItemCount = layoutManager.getChildCount();
+                int totalItemCount = layoutManager.getItemCount();
+                int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+                // No need to handle pagination for favorite movies
+                if (loading && category != MovieCategory.FAVORITE) {
+                    if ((visibleItemCount + firstVisibleItem) >= totalItemCount) {
+                        loading = false;
+                        if(page != lastPage) {
+                            incrementPage();
+                            viewModel.onAllMoviesSelected(page, category);
                         }
                     }
                 }
+            }
             }
         });
     }
@@ -120,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         page = page + 1;
     }
 
-    private void updateCategory(int newCategory) {
+    private void updateCategory(MovieCategory newCategory) {
         page = Constants.FIRST_PAGE;
         category = newCategory;
     }
@@ -136,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
 
-        if(category == Constants.SORT_FAVORITE) {
+        if(category == MovieCategory.FAVORITE) {
             mNoResultsMessage.setVisibility(View.VISIBLE);
         } else {
             mErrorMessage.setVisibility(View.VISIBLE);
@@ -145,6 +149,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     @Override
     public void onMovieItemClick(Movie movie) {
+        // Have to reset the category to popular here because once the user comes back
+        // from a detail activity he arrives in the popular list
+        //updateCategory(MovieCategory.POPULAR);
         Intent startChildActivityIntent = new Intent(this, DetailsActivity.class);
         startChildActivityIntent.putExtra(Constants.EXTRA_MOVIE, movie);
         startActivity(startChildActivityIntent);
@@ -168,8 +175,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         int id = item.getItemId();
 
         if (id == R.id.action_sort_popular) {
-            updateCategory(Constants.SORT_POPULAR);
-            viewModel.setMoviesList(page, category);
+            updateCategory(MovieCategory.POPULAR);
+            viewModel.onAllMoviesSelected(page, category);
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
             disableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
@@ -179,8 +186,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
 
         if (id == R.id.action_sort_rating) {
-            updateCategory(Constants.SORT_RATING);
-            viewModel.setMoviesList(page, category);
+            updateCategory(MovieCategory.TOP_RATED);
+            viewModel.onAllMoviesSelected(page, category);
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
             disableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
@@ -190,8 +197,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
 
         if (id == R.id.action_sort_favorite) {
-            updateCategory(Constants.SORT_FAVORITE);
-            viewModel.setMoviesList(page, category);
+            updateCategory(MovieCategory.FAVORITE);
+            viewModel.onFavoriteMoviesSelected();
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_favorite));
             disableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));

@@ -1,5 +1,6 @@
 package com.cicconi.popularmovies.model;
 
+import com.cicconi.popularmovies.database.FavoriteMovie;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
@@ -49,6 +50,8 @@ public class Movie implements Serializable {
     @SerializedName("release_date")
     @Expose
     private String releaseDate;
+
+    private Boolean isFavorite;
 
     public Double getPopularity() {
         return popularity;
@@ -160,5 +163,25 @@ public class Movie implements Serializable {
 
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
+    }
+
+    public void setFavorite(Boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    public Boolean getFavorite() {
+        return isFavorite;
+    }
+
+    public FavoriteMovie toFavoriteMovie() {
+
+        return new FavoriteMovie(
+            this.getId(),
+            this.getOriginalTitle(),
+            this.getOverview(),
+            this.getReleaseDate(),
+            this.getPopularity(),
+            this.getPosterPath()
+        );
     }
 }

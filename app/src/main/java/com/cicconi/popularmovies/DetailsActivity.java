@@ -10,21 +10,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.cicconi.popularmovies.adapter.ReviewAdapter;
 import com.cicconi.popularmovies.adapter.VideoAdapter;
-import com.cicconi.popularmovies.database.AppDatabase;
-import com.cicconi.popularmovies.database.FavoriteMovie;
 import com.cicconi.popularmovies.model.Movie;
-import com.cicconi.popularmovies.viewmodel.DetailViewModel;
+import com.cicconi.popularmovies.model.Review;
+import com.cicconi.popularmovies.model.Video;
+import com.cicconi.popularmovies.viewmodel.DetailsViewModel;
+import com.cicconi.popularmovies.viewmodel.DetailsViewModelFactory;
 import com.squareup.picasso.Picasso;
-import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
+import java.util.List;
 
 public class DetailsActivity extends AppCompatActivity implements VideoAdapter.VideoClickListener {
 
@@ -38,10 +39,10 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
     private TextView mVideosLabel;
     private TextView mReviewsLabel;
     private ImageView mFavoriteIcon;
+    ScrollView mMovieLayout;
+    TextView mErrorMessage;
 
-    private DetailViewModel viewModel;
-
-    private AppDatabase mDb;
+    private DetailsViewModel viewModel;
 
     private Movie movie;
 
@@ -60,31 +61,37 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
         mVideosLabel = findViewById(R.id.tv_videos);
         mReviewsLabel = findViewById(R.id.tv_reviews);
         mFavoriteIcon = findViewById(R.id.iv_favorite);
-
-        ScrollView mMovieLayout = findViewById(R.id.movie_layout);
-        TextView mErrorMessage = findViewById(R.id.tv_error_message);
+        mMovieLayout = findViewById(R.id.movie_layout);
+        mErrorMessage = findViewById(R.id.tv_error_message);
 
         compositeDisposable = new CompositeDisposable();
-
-        mDb = AppDatabase.getInstance(getApplicationContext());
-
-        viewModel = new ViewModelProvider(this).get(DetailViewModel.class);
 
         Intent intent = getIntent();
         if (intent.hasExtra(Constants.EXTRA_MOVIE)) {
             movie = (Movie) intent.getExtras().getSerializable(Constants.EXTRA_MOVIE);
 
             if(null == movie) {
-                mMovieLayout.setVisibility(View.GONE);
-                mErrorMessage.setVisibility(View.VISIBLE);
+                showErrorMessage();
             } else {
-                loadMovie(movie);
-                loadVideos(movie.getId());
-                loadReviews(movie.getId());
-                onFavoriteIconClick();
+                showMovieView();
             }
         }
 
+    }
+
+    private void showErrorMessage() {
+        mMovieLayout.setVisibility(View.GONE);
+        mErrorMessage.setVisibility(View.VISIBLE);
+    }
+
+    private void showMovieView() {
+        DetailsViewModelFactory factory = new DetailsViewModelFactory(this, movie);
+        viewModel = new ViewModelProvider(this, factory).get(DetailsViewModel.class);
+
+        loadMovie(movie);
+        loadVideos();
+        loadReviews();
+        loadFavoriteIcon();
     }
 
     private void loadMovie(Movie movie) {
@@ -124,7 +131,7 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
             .into(mThumbnail);
     }
 
-    private void loadVideos(Integer videoId) {
+    private void loadVideos() {
         RecyclerView mVideoRecyclerView = findViewById(R.id.recyclerview_videos);
         LinearLayoutManager videoLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mVideoRecyclerView.setLayoutManager(videoLayoutManager);
@@ -133,16 +140,22 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
         VideoAdapter mVideoAdapter = new VideoAdapter(this);
         mVideoRecyclerView.setAdapter(mVideoAdapter);
 
-        viewModel.getVideos(videoId).observe(this, videos -> {
-            Log.i(TAG, "video live data changed");
-            if (!videos.isEmpty()) {
-                mVideosLabel.setVisibility(View.VISIBLE);
-                mVideoAdapter.setVideoData(videos);
+        viewModel.getVideos().observe(this, new Observer<List<Video>>() {
+            @Override
+            public void onChanged(List<Video> videos) {
+                Log.i(TAG, "video live data changed");
+                if (!videos.isEmpty()) {
+                    mVideosLabel.setVisibility(View.VISIBLE);
+                    mVideoAdapter.setVideoData(videos);
+                }
+
+                // Removing observer because this data won't be updated
+                viewModel.getVideos().removeObserver(this);
             }
         });
     }
 
-    private void loadReviews(Integer videoId) {
+    private void loadReviews() {
         RecyclerView mReviewRecyclerView = findViewById(R.id.recyclerview_reviews);
         LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mReviewRecyclerView.setLayoutManager(reviewLayoutManager);
@@ -151,11 +164,17 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
         ReviewAdapter mReviewAdapter = new ReviewAdapter();
         mReviewRecyclerView.setAdapter(mReviewAdapter);
 
-        viewModel.getReviews(videoId).observe(this, reviews -> {
-            Log.i(TAG, "video live data changed");
-            if (!reviews.isEmpty()) {
-                mReviewsLabel.setVisibility(View.VISIBLE);
-                mReviewAdapter.setReviewData(reviews);
+        viewModel.getReviews().observe(this, new Observer<List<Review>>() {
+            @Override
+            public void onChanged(List<Review> reviews) {
+                Log.i(TAG, "video live data changed");
+                if (!reviews.isEmpty()) {
+                    mReviewsLabel.setVisibility(View.VISIBLE);
+                    mReviewAdapter.setReviewData(reviews);
+                }
+
+                // Removing observer because this data won't be updated
+                viewModel.getReviews().removeObserver(this);
             }
         });
     }
@@ -172,35 +191,61 @@ public class DetailsActivity extends AppCompatActivity implements VideoAdapter.V
         }
     }
 
-    private void onFavoriteIconClick() {
-        mFavoriteIcon.setOnClickListener(view -> {
-            mFavoriteIcon.setColorFilter(getResources().getColor(R.color.colorFavorite));
+    private void loadFavoriteIcon() {
+        viewModel.getIsFavoriteMovie().observe(this, isFavorite -> {
+            Log.i(TAG, "isFavorite live data changed: " + isFavorite);
+            if(isFavorite){
+                mFavoriteIcon.setColorFilter(getResources().getColor(R.color.colorFavorite));
+            }
 
-            FavoriteMovie favoriteMovie = new FavoriteMovie(
-                movie.getId(),
-                movie.getOriginalTitle(),
-                movie.getOverview(),
-                movie.getReleaseDate(),
-                movie.getPopularity(),
-                movie.getPosterPath()
+            onFavoriteIconClick(isFavorite);
+        });
+    }
+
+    private void onFavoriteIconClick(Boolean isFavorite) {
+        mFavoriteIcon.setOnClickListener(view -> {
+            if(isFavorite) {
+                removeMovieFromFavorites();
+            } else {
+                addMovieToFavorites();
+            }
+        });
+    }
+
+    private void addMovieToFavorites() {
+        Disposable disposable = viewModel.onMovieAddedToFavorites()
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnError(e -> {
+                e.printStackTrace();
+                Toast.makeText(DetailsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+            })
+            .subscribe(
+                () -> {
+                    mFavoriteIcon.setColorFilter(getResources().getColor(R.color.colorFavorite));
+                    Toast.makeText(DetailsActivity.this, "The movie was added to favorites", Toast.LENGTH_SHORT).show();
+                },
+                Throwable::printStackTrace
             );
 
-            Completable query = mDb.favoriteMovieDAO().insertFavoriteMovie(favoriteMovie);
+        compositeDisposable.add(disposable);
+    }
 
-            Disposable disposable = query
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(e -> {
-                    e.printStackTrace();
-                    Toast.makeText(DetailsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
-                })
-                .subscribe(
-                    () -> Log.d(TAG, "New favorite movie saved"),
-                    Throwable::printStackTrace
-                );
+    private void removeMovieFromFavorites() {
+        Disposable disposable = viewModel.onMovieRemovedFromFavorites()
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnError(e -> {
+                e.printStackTrace();
+                Toast.makeText(DetailsActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+            })
+            .subscribe(
+                () -> {
+                    mFavoriteIcon.setColorFilter(getResources().getColor(R.color.colorSecondaryText));
+                    Toast.makeText(DetailsActivity.this, "The movie was removed from favorites", Toast.LENGTH_SHORT).show();
+                },
+                Throwable::printStackTrace
+            );
 
-            compositeDisposable.add(disposable);
-        });
+        compositeDisposable.add(disposable);
     }
 
     @Override

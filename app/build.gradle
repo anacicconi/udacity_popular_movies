@@ -67,4 +67,7 @@ dependencies {
 
     // Room - RxJava support
     implementation "androidx.room:room-rxjava2:2.2.5"
+
+    // Inspect devices files (database)
+    implementation 'com.facebook.stetho:stetho:1.5.1'
 }

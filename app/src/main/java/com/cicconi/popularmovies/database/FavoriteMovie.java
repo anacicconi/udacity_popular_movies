@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import com.cicconi.popularmovies.model.Movie;
 
 @Entity(tableName = "favorite_movie")
 public class FavoriteMovie {
@@ -68,5 +69,17 @@ public class FavoriteMovie {
 
     public String getPosterPath() {
         return posterPath;
+    }
+
+    public Movie toMovie() {
+        Movie movie = new Movie();
+        movie.setId(this.getApiId());
+        movie.setOriginalTitle(this.getOriginalTitle());
+        movie.setOverview(this.getOverview());
+        movie.setReleaseDate(this.getReleaseDate());
+        movie.setVoteAverage(this.getVoteAverage());
+        movie.setPosterPath(this.getPosterPath());
+
+        return movie;
     }
 }
