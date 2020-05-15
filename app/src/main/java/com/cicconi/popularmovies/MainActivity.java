@@ -94,9 +94,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private void loadMovies() {
         loadStart();
 
-        // In case of configuration changes the activity will observe the movies values again
-        // and the viewmodel sends the last value it had which can be category "popular" and page "4"
-        // So it adds to the movies variable a value that was already there
         viewModel.getMovies().observe(this, movies -> {
             Log.i(TAG, "movie live data changed");
             loadFinish(movies);
