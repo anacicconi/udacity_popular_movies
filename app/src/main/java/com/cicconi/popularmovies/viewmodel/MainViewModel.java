@@ -11,12 +11,15 @@ import com.cicconi.popularmovies.Constants;
 import com.cicconi.popularmovies.MovieCategory;
 import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.repository.MovieRepository;
-import io.reactivex.disposables.CompositeDisposable;
 import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {
 
     private static final String TAG = MainViewModel.class.getSimpleName();
+
+    // The page and the category are hold by the viewmodel so it is not reset each ime the activity is recreated
+    private Integer page = Constants.FIRST_PAGE;
+    private MovieCategory category = MovieCategory.POPULAR;
 
     private MovieRepository movieRepository;
 
@@ -41,11 +44,7 @@ public class MainViewModel extends AndroidViewModel {
         movies.addSource(allMovies, value -> movies.setValue(value));
     }
 
-    public LiveData<List<Movie>> getMovies() {
-        return movies;
-    }
-
-    public void onAllMoviesSelected(int page, MovieCategory category) {
+    public void onAllMoviesSelected() {
         resetMoviesSource();
         // need to set the allMovies list again because the source can change accordingly to the parameters
         allMovies = movieRepository.getMovies(String.valueOf(page), category);
@@ -56,6 +55,30 @@ public class MainViewModel extends AndroidViewModel {
         resetMoviesSource();
         // favoriteMovies has always the same source so no need to set it again, just add it as a source
         movies.addSource(favoriteMovies, value -> movies.setValue(value));
+    }
+
+    public LiveData<List<Movie>> getMovies() {
+        return movies;
+    }
+
+    public Integer getPage() {
+        return page;
+    }
+
+    public void incrementPage() {
+        page = page + 1;
+    }
+
+    public void resetPage() {
+        page = Constants.FIRST_PAGE;
+    }
+
+    public MovieCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(MovieCategory movieCategory) {
+        category = movieCategory;
     }
 
     // Reset the values on the MediatorLiveData.

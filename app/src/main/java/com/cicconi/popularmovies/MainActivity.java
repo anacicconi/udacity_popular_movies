@@ -41,8 +41,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private boolean loading = true;
     final private int lastPage = 50;
-    private int page = Constants.FIRST_PAGE;
-    private MovieCategory category = MovieCategory.POPULAR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,12 +77,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 int totalItemCount = layoutManager.getItemCount();
                 int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
                 // No need to handle pagination for favorite movies
-                if (loading && category != MovieCategory.FAVORITE) {
+                if (loading && viewModel.getCategory() != MovieCategory.FAVORITE) {
                     if ((visibleItemCount + firstVisibleItem) >= totalItemCount) {
                         loading = false;
-                        if(page != lastPage) {
-                            incrementPage();
-                            viewModel.onAllMoviesSelected(page, category);
+                        if(viewModel.getPage() != lastPage) {
+                            viewModel.incrementPage();
+                            viewModel.onAllMoviesSelected();
                         }
                     }
                 }
@@ -110,24 +108,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         if (!movies.isEmpty()) {
             loading = true;
 
-            if(page == Constants.FIRST_PAGE) {
+            if(viewModel.getPage() == Constants.FIRST_PAGE) {
                 mRecyclerView.scrollToPosition(0);
             }
 
             showMovieView();
-            mMovieAdapter.setMoviesData(movies, page);
+            mMovieAdapter.setMoviesData(movies, viewModel.getPage());
         } else {
             showErrorMessage();
         }
-    }
-
-    private void incrementPage() {
-        page = page + 1;
-    }
-
-    private void updateCategory(MovieCategory newCategory) {
-        page = Constants.FIRST_PAGE;
-        category = newCategory;
     }
 
     private void showMovieView() {
@@ -141,11 +130,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
 
-        if(category == MovieCategory.FAVORITE) {
+        if(viewModel.getCategory() == MovieCategory.FAVORITE) {
             mNoResultsMessage.setVisibility(View.VISIBLE);
         } else {
             mErrorMessage.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void updateCategory(MovieCategory newCategory) {
+        viewModel.resetPage();
+        viewModel.setCategory(newCategory);
     }
 
     @Override
@@ -176,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         if (id == R.id.action_sort_popular) {
             updateCategory(MovieCategory.POPULAR);
-            viewModel.onAllMoviesSelected(page, category);
+            viewModel.onAllMoviesSelected();
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
             disableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
@@ -187,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         if (id == R.id.action_sort_rating) {
             updateCategory(MovieCategory.TOP_RATED);
-            viewModel.onAllMoviesSelected(page, category);
+            viewModel.onAllMoviesSelected();
 
             enableMenuItem(mMainMenu.findItem(R.id.action_sort_rating));
             disableMenuItem(mMainMenu.findItem(R.id.action_sort_popular));
