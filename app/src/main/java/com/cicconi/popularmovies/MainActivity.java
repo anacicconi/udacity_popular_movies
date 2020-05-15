@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Stetho.initializeWithDefaults(this);
+        //Used to debug database content
+        //Stetho.initializeWithDefaults(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -151,7 +152,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     public void onMovieItemClick(Movie movie) {
         // Have to reset the category to popular here because once the user comes back
         // from a detail activity he arrives in the popular list
-        //updateCategory(MovieCategory.POPULAR);
         Intent startChildActivityIntent = new Intent(this, DetailsActivity.class);
         startChildActivityIntent.putExtra(Constants.EXTRA_MOVIE, movie);
         startActivity(startChildActivityIntent);

@@ -3,6 +3,8 @@ package com.cicconi.popularmovies.repository;
 import android.content.Context;
 import android.util.Log;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.LiveDataReactiveStreams;
+import androidx.lifecycle.Transformations;
 import com.cicconi.popularmovies.MovieCategory;
 import com.cicconi.popularmovies.database.AppDatabase;
 import com.cicconi.popularmovies.database.FavoriteMovie;
@@ -13,6 +15,7 @@ import com.cicconi.popularmovies.model.VideoResponse;
 import com.cicconi.popularmovies.network.RetrofitBuilder;
 import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.model.MovieResponse;
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
@@ -32,17 +35,22 @@ public class MovieRepository {
         mDb = AppDatabase.getInstance(context);
     }
 
-    public Observable<List<Movie>> getMovies(String page, MovieCategory category) {
-        if(category == MovieCategory.POPULAR) {
-            return getPopularMovies(page);
+    public LiveData<List<Movie>> getMovies(String page, MovieCategory category) {
+        Observable<List<Movie>> moviesObservable;
+
+        switch (category) {
+            case POPULAR:
+                moviesObservable = getPopularMovies(page);
+                break;
+            case TOP_RATED:
+                moviesObservable = getTopRatedMovies(page);
+                break;
+            default:
+                // always return an empty object in case of error so the view knows that it has to display the error message
+                moviesObservable = Observable.just(getEmptyMovieList());
         }
 
-        if(category == MovieCategory.TOP_RATED) {
-            return getTopRatedMovies(page);
-        }
-
-        // always return an empty object in case of error so the view knows that it has to display the error message
-        return Observable.just(getEmptyMovieList());
+        return LiveDataReactiveStreams.fromPublisher(moviesObservable.toFlowable(BackpressureStrategy.BUFFER));
     }
 
     private Observable<List<Movie>> getPopularMovies(String page) {
@@ -73,12 +81,22 @@ public class MovieRepository {
             });
     }
 
-    public LiveData<List<FavoriteMovie>> getFavoriteMovies() {
-        return mDb.favoriteMovieDAO().loadAllFavoriteMovies();
+    public LiveData<List<Movie>> getFavoriteMovies() {
+        // Transforming the favorite movies into movies
+        // Only simple operations because transformations are executed on the main thread
+        return Transformations.map(mDb.favoriteMovieDAO().loadAllFavoriteMovies(), favoriteMovies -> {
+            List<Movie> moviesList = new ArrayList<>();
+
+            for (FavoriteMovie favoriteMovie : favoriteMovies) {
+                moviesList.add(favoriteMovie.toMovie());
+            }
+
+            return moviesList;
+        });
     }
 
-    public Observable<List<Video>> getVideosById(int movieApiId) {
-        return RetrofitBuilder.getClient().getMovieVideos(movieApiId, API_KEY)
+    public LiveData<List<Video>> getVideosById(int movieApiId) {
+        Observable<List<Video>> videosObservable = RetrofitBuilder.getClient().getMovieVideos(movieApiId, API_KEY)
             .subscribeOn(Schedulers.io())
             .doOnNext(i -> Log.d(TAG, String.format("Thread getVideosById: %s", Thread.currentThread().getName())))
             .onErrorReturn(e -> getEmptyVideoResponse())
@@ -89,10 +107,12 @@ public class MovieRepository {
 
                 return getEmptyVideoList();
             });
+
+        return LiveDataReactiveStreams.fromPublisher(videosObservable.toFlowable(BackpressureStrategy.BUFFER));
     }
 
-    public Observable<List<Review>> getReviewsById(int movieApiId) {
-        return RetrofitBuilder.getClient().getMovieReviews(movieApiId, API_KEY)
+    public LiveData<List<Review>> getReviewsById(int movieApiId) {
+        Observable<List<Review>> reviewsObservable = RetrofitBuilder.getClient().getMovieReviews(movieApiId, API_KEY)
             .subscribeOn(Schedulers.io())
             .doOnNext(i -> Log.d(TAG, String.format("Thread getReviewsById: %s", Thread.currentThread().getName())))
             .onErrorReturn(e -> getEmptyReviewResponse())
@@ -103,14 +123,14 @@ public class MovieRepository {
 
                 return getEmptyReviewList();
             });
+
+        return LiveDataReactiveStreams.fromPublisher(reviewsObservable.toFlowable(BackpressureStrategy.BUFFER));
     }
 
-    // database returning livedata
     public LiveData<Integer> getFavoriteMovieByApiId(int movieApiId) {
         return mDb.favoriteMovieDAO().loadFavoriteMovieByApiId(movieApiId);
     }
 
-    // database returning rx completable
     public Completable addFavoriteMovie(FavoriteMovie favoriteMovie) {
         return mDb.favoriteMovieDAO().insertFavoriteMovie(favoriteMovie)
             .subscribeOn(Schedulers.io())

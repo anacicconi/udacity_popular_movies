@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.LiveDataReactiveStreams;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
@@ -12,7 +11,6 @@ import com.cicconi.popularmovies.model.Movie;
 import com.cicconi.popularmovies.model.Review;
 import com.cicconi.popularmovies.model.Video;
 import com.cicconi.popularmovies.repository.MovieRepository;
-import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
 import java.util.List;
 
@@ -39,24 +37,16 @@ public class DetailsViewModel extends ViewModel {
         }
     }
 
-    // Getting observable from api and transforming into LiveData
     public LiveData<List<Video>> getVideos() {
         Log.i(TAG, String.format("Getting videos of movie %d", movie.getId()));
 
-        return LiveDataReactiveStreams.fromPublisher(
-            movieRepository.getVideosById(movie.getId())
-                .toFlowable(BackpressureStrategy.BUFFER)
-        );
+        return movieRepository.getVideosById(movie.getId());
     }
 
-    // Getting observable from api and transforming into LiveData
     public LiveData<List<Review>> getReviews() {
         Log.i(TAG, String.format("Getting reviews of movie %d", movie.getId()));
 
-        return LiveDataReactiveStreams.fromPublisher(
-            movieRepository.getReviewsById(movie.getId())
-                .toFlowable(BackpressureStrategy.BUFFER)
-        );
+        return movieRepository.getReviewsById(movie.getId());
     }
 
     public LiveData<Boolean> getIsFavoriteMovie() {
