@@ -18,8 +18,8 @@ public class MainViewModel extends AndroidViewModel {
     private static final String TAG = MainViewModel.class.getSimpleName();
 
     // The page and the category are hold by the viewmodel so it is not reset each ime the activity is recreated
-    private Integer page = Constants.FIRST_PAGE;
-    private MovieCategory category = MovieCategory.POPULAR;
+    public Integer page = Constants.FIRST_PAGE;
+    public MovieCategory category = MovieCategory.POPULAR;
 
     private MovieRepository movieRepository;
 
@@ -32,7 +32,6 @@ public class MainViewModel extends AndroidViewModel {
     public MainViewModel(@NonNull Application application) {
         super(application);
         Context context = application.getApplicationContext();
-
         movieRepository = new MovieRepository(context);
 
         Log.i(TAG, "Initializing movies lists");
@@ -61,20 +60,12 @@ public class MainViewModel extends AndroidViewModel {
         return movies;
     }
 
-    public Integer getPage() {
-        return page;
-    }
-
     public void incrementPage() {
         page = page + 1;
     }
 
     public void resetPage() {
         page = Constants.FIRST_PAGE;
-    }
-
-    public MovieCategory getCategory() {
-        return category;
     }
 
     public void setCategory(MovieCategory movieCategory) {

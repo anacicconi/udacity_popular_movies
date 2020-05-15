@@ -77,10 +77,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 int totalItemCount = layoutManager.getItemCount();
                 int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
                 // No need to handle pagination for favorite movies
-                if (loading && viewModel.getCategory() != MovieCategory.FAVORITE) {
+                if (loading && viewModel.category != MovieCategory.FAVORITE) {
                     if ((visibleItemCount + firstVisibleItem) >= totalItemCount) {
                         loading = false;
-                        if(viewModel.getPage() != lastPage) {
+                        if(viewModel.page != lastPage) {
                             viewModel.incrementPage();
                             viewModel.onAllMoviesSelected();
                         }
@@ -94,6 +94,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private void loadMovies() {
         loadStart();
 
+        // In case of configuration changes the activity will observe the movies values again
+        // and the viewmodel sends the last value it had which can be category "popular" and page "4"
+        // So it adds to the movies variable a value that was already there
         viewModel.getMovies().observe(this, movies -> {
             Log.i(TAG, "movie live data changed");
             loadFinish(movies);
@@ -108,12 +111,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         if (!movies.isEmpty()) {
             loading = true;
 
-            if(viewModel.getPage() == Constants.FIRST_PAGE) {
+            if(viewModel.page == Constants.FIRST_PAGE) {
                 mRecyclerView.scrollToPosition(0);
             }
 
             showMovieView();
-            mMovieAdapter.setMoviesData(movies, viewModel.getPage());
+            mMovieAdapter.setMoviesData(movies, viewModel.page);
         } else {
             showErrorMessage();
         }
@@ -130,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
 
-        if(viewModel.getCategory() == MovieCategory.FAVORITE) {
+        if(viewModel.category == MovieCategory.FAVORITE) {
             mNoResultsMessage.setVisibility(View.VISIBLE);
         } else {
             mErrorMessage.setVisibility(View.VISIBLE);

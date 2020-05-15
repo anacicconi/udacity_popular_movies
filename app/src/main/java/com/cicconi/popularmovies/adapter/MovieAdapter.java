@@ -27,7 +27,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     public void setMoviesData(List<Movie> movies, int page) {
-        if(page == 1) {
+        if(page == Constants.FIRST_PAGE) {
             mMovies = movies;
         } else {
             mMovies.addAll(movies);

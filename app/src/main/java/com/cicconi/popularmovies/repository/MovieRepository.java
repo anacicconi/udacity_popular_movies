@@ -29,7 +29,7 @@ public class MovieRepository {
     private static AppDatabase mDb;
 
     //TODO: add your api key
-    private static final String API_KEY = "";
+    private static final String API_KEY = "3033d03f5ccf66a68781fd526cfbe685";
 
     public MovieRepository(Context context) {
         mDb = AppDatabase.getInstance(context);
