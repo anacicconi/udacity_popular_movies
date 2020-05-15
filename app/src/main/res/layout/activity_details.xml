@@ -53,12 +53,13 @@
             <ImageView
                 android:id="@+id/iv_favorite"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_star_24dp"
+                android:layout_height="48dp"
                 android:adjustViewBounds="true"
-                app:layout_constraintTop_toTopOf="@+id/tv_title_label"
-                app:layout_constraintStart_toEndOf="@+id/guideline2"
+                android:scaleType="fitEnd"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/guideline2"
+                app:layout_constraintTop_toTopOf="@+id/tv_title_label"
+                app:srcCompat="@drawable/ic_star_24dp"
                 />
             <TextView
                 android:id="@+id/tv_synopsis_label"
